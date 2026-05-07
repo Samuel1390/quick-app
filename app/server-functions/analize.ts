@@ -3,31 +3,11 @@
 import { LighthouseResult, PageSpeedResponse, RuntimeError } from "./types"
 
 export type LighthouseMetrics = {
-  first_contentful_paint_ms: {
-    value: string | undefined
-    label: string
-    abreviation: string
-  }
-  speed_index: {
-    value: string | undefined
-    label: string
-    abreviation: string
-  }
-  largest_contentful_paint_ms: {
-    value: string | undefined
-    label: string
-    abreviation: string
-  }
-  total_blocking_time_ms: {
-    value: string | undefined
-    label: string
-    abreviation: string
-  }
-  time_to_interactive_ms: {
-    value: string | undefined
-    label: string
-    abreviation: string
-  }
+  first_contentful_paint_ms?: string
+  speed_index?: string
+  largest_contentful_paint_ms?: string
+  total_blocking_time_ms?: string
+  time_to_interactive_ms?: string
 }
 export type ReturnValue =
   | { lighthouse: LighthouseResult; lighthouseMetrics: LighthouseMetrics }
@@ -87,71 +67,19 @@ export default async function analize(
     // }
 
     const lighthouse = json.lighthouseResult
-    const lighthouseMetrics = {
-      first_contentful_paint_ms: {
-        value: lighthouse.audits["first-contentful-paint"]?.displayValue,
-        label: "Primer Pintado de Contenido",
-        abreviation: "FCP",
-      },
-      speed_index: {
-        value: lighthouse.audits["speed-index"]?.displayValue,
-        label: "Índice de Velocidad",
-        abreviation: "SI",
-      },
-      largest_contentful_paint_ms: {
-        value: lighthouse.audits["largest-contentful-paint"]?.displayValue,
-        label: "Pintado de Contenido Más Grande",
-        abreviation: "LCP",
-      },
-      total_blocking_time_ms: {
-        value: lighthouse.audits["total-blocking-time"]?.displayValue,
-        label: "Tiempo de Bloqueo Total",
-        abreviation: "TBT",
-      },
-      time_to_interactive_ms: {
-        value: lighthouse.audits["interactive"]?.displayValue,
-        label: "Tiempo para la Interactividad",
-        abreviation: "TTI",
-      },
+    const lighthouseMetrics: LighthouseMetrics = {
+      first_contentful_paint_ms:
+        lighthouse.audits["first-contentful-paint"]?.displayValue,
+      speed_index: lighthouse.audits["speed-index"]?.displayValue,
+      largest_contentful_paint_ms:
+        lighthouse.audits["largest-contentful-paint"]?.displayValue,
+      total_blocking_time_ms:
+        lighthouse.audits["total-blocking-time"]?.displayValue,
+      time_to_interactive_ms: lighthouse.audits["interactive"]?.displayValue,
     }
     return { lighthouse, lighthouseMetrics }
   } catch (error) {
     console.error("Fetching PageSpeed Insights failed:", error)
     return null
-  }
-}
-
-function showInitialContent(id: string) {
-  document.body.innerHTML = "" // Clear previous content
-  const title = document.createElement("h1")
-  title.textContent = "PageSpeed Insights API Demo"
-  document.body.appendChild(title)
-
-  const page = document.createElement("p")
-  page.textContent = `Page tested: ${id}`
-  document.body.appendChild(page)
-}
-
-function showCruxContent(cruxMetrics: Record<string, string>) {
-  const cruxHeader = document.createElement("h2")
-  cruxHeader.textContent = "Chrome User Experience Report Results"
-  document.body.appendChild(cruxHeader)
-
-  for (const key in cruxMetrics) {
-    const p = document.createElement("p")
-    p.textContent = `${key}: ${cruxMetrics[key]}`
-    document.body.appendChild(p)
-  }
-}
-
-function showLighthouseContent(lighthouseMetrics: any) {
-  const lighthouseHeader = document.createElement("h2")
-  lighthouseHeader.textContent = "Lighthouse Results"
-  document.body.appendChild(lighthouseHeader)
-
-  for (const key in lighthouseMetrics) {
-    const p = document.createElement("p")
-    p.textContent = `${key}: ${lighthouseMetrics[key]}`
-    document.body.appendChild(p)
   }
 }

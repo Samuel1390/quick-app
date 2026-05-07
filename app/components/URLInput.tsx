@@ -49,11 +49,16 @@ export default function URLInput() {
     }
     return ""
   }
+  const inputOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFeedbackMessage("")
+    setIsValidURL(true) // no es que sea realmente valido, si no que cambia el estado a true para que el input deje de estar en rojo
+    setUrl(e.target.value)
+  }
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="grid w-full max-w-sm grid-cols-1 gap-2 px-4"
+      className="grid w-full max-w-lg grid-cols-1 gap-2 px-4"
     >
       <div
         className={`${focusClass()} relative flex rounded-md transition-all`}
@@ -66,11 +71,7 @@ export default function URLInput() {
           placeholder="Ingresa tu url"
           className={`${isValidURL === false ? "border-red-300 bg-red-400/10 dark:border-red-800 dark:bg-red-800/40" : ""} flex w-full rounded-r-none focus-visible:ring-0 focus-visible:ring-offset-0`}
           value={url}
-          onChange={(e) => {
-            setFeedbackMessage("")
-            setIsValidURL(true)
-            setUrl(e.target.value)
-          }}
+          onChange={inputOnChange}
           onFocus={() => setInputOnFocus(true)}
           onBlur={() => setInputOnFocus(false)}
         />
