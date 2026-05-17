@@ -1,5 +1,5 @@
 import React from "react"
-import { type RuntimeError } from "../server-functions/types"
+import { type RuntimeError } from "../../server-functions/types"
 import {
   Card,
   CardHeader,

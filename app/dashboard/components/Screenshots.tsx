@@ -1,14 +1,13 @@
 import React from "react"
 import Image from "next/image"
-import { type LighthouseResult } from "../server-functions/types"
+import { type LighthouseResult } from "../../server-functions/types"
 
 type Props = {
   lighthouseResult: LighthouseResult
 }
 
 const Screenshots = ({ lighthouseResult }: Props) => {
-  const screenshotThumbnails =
-    lighthouseResult.audits["screenshot-thumbnails"]
+  const screenshotThumbnails = lighthouseResult.audits["screenshot-thumbnails"]
   const items = screenshotThumbnails?.details?.items
 
   if (!items || items.length === 0) {
@@ -23,7 +22,7 @@ const Screenshots = ({ lighthouseResult }: Props) => {
       <h2 className="my-4 text-center text-xl font-semibold md:text-2xl">
         Visualización de carga de la página
       </h2>
-      <div className="flex w-full items-center gap-2 overflow-x-auto p-4">
+      <div className="flex w-fit max-w-full items-center gap-2 overflow-x-auto p-4">
         {items.map((item, i) => {
           const timeInSecondsString =
             (item.timing / 1000).toFixed(1).toString() + "s"

@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --breakpoint-xsm: 450px;
+  --breakpoint-xsm: 500px;
   --text-xsm: 0.75rem;
   --font-heading: var(--font-sans);
   --font-sans: var(--font-sans);

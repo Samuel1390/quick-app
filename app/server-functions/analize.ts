@@ -40,7 +40,12 @@ export default async function analize(
 
   try {
     console.log(url.toString())
-    const response = await fetch(url)
+    const response = await fetch(url, {
+      next: {
+        revalidate: 600,
+        tags: [`page-speed-${targetUrl}-${device}`],
+      },
+    })
     if (!response.ok) {
       console.log(response.statusText)
       if (response.status === 400) {
@@ -61,19 +66,6 @@ export default async function analize(
     ) {
       return json.lighthouseResult.runtimeError
     }
-
-    // const cruxMetrics = {
-    //   first_contentful_paint_ms: {
-    //     value:
-    //       json.loadingExperience.metrics.FIRST_CONTENTFUL_PAINT_MS?.category,
-    //     label: "First Contentful Paint",
-    //   },
-    //   interaction_to_next_paint: {
-    //     value:
-    //       json.loadingExperience.metrics.INTERACTION_TO_NEXT_PAINT?.category,
-    //     label: "Interaction to Next Paint",
-    //   },
-    // }
 
     const lighthouse = json.lighthouseResult
     console.log(Object.keys(lighthouse.audits))
