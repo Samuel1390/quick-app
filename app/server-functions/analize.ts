@@ -1,6 +1,6 @@
 "use server"
 
-import { LighthouseResult, PageSpeedResponse, RuntimeError } from "./types"
+import { LighthouseResult, Root, RuntimeError } from "./types"
 
 export type LighthouseMetrics = {
   first_contentful_paint_ms?: string
@@ -8,9 +8,14 @@ export type LighthouseMetrics = {
   largest_contentful_paint_ms?: string
   total_blocking_time_ms?: string
   time_to_interactive_ms?: string
+  network_server_latency_ms?: string
 }
 export type ReturnValue =
-  | { lighthouse: LighthouseResult; lighthouseMetrics: LighthouseMetrics }
+  | {
+      lighthouse: LighthouseResult
+      lighthouseMetrics: LighthouseMetrics
+      response: Root
+    }
   | RuntimeError
   | null
 
@@ -34,6 +39,7 @@ export default async function analize(
   }
 
   try {
+    console.log(url.toString())
     const response = await fetch(url)
     if (!response.ok) {
       console.log(response.statusText)
@@ -48,8 +54,11 @@ export default async function analize(
       }
       throw new Error(`HTTP error! status: ${response.status}`)
     }
-    const json: PageSpeedResponse = await response.json()
-    if (json?.lighthouseResult.runtimeError) {
+    const json: Root = await response.json()
+    if (
+      json?.lighthouseResult.runtimeError &&
+      "code" in json.lighthouseResult.runtimeError
+    ) {
       return json.lighthouseResult.runtimeError
     }
 
@@ -67,6 +76,7 @@ export default async function analize(
     // }
 
     const lighthouse = json.lighthouseResult
+    console.log(Object.keys(lighthouse.audits))
     const lighthouseMetrics: LighthouseMetrics = {
       first_contentful_paint_ms:
         lighthouse.audits["first-contentful-paint"]?.displayValue,
@@ -76,8 +86,11 @@ export default async function analize(
       total_blocking_time_ms:
         lighthouse.audits["total-blocking-time"]?.displayValue,
       time_to_interactive_ms: lighthouse.audits["interactive"]?.displayValue,
+      network_server_latency_ms:
+        lighthouse.audits["network-server-latency"]?.displayValue,
     }
-    return { lighthouse, lighthouseMetrics }
+
+    return { lighthouse, lighthouseMetrics, response: json }
   } catch (error) {
     console.error("Fetching PageSpeed Insights failed:", error)
     return null

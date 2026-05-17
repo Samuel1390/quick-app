@@ -1,5 +1,7 @@
 "use client"
+import ResourceSizePieChart from "./ResourceSizePieChart"
 import { AppSidebar } from "@/components/app-sidebar"
+import Screenshots from "./Screenshots"
 import { SectionCards } from "@/components/section-cards"
 import { SiteHeader } from "@/components/site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
@@ -8,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import Link from "next/link"
 import { useTransition, useEffect, useState } from "react"
+import MainThreadMetricsData from "./MainThreadMetricsData"
 import analize, { type ReturnValue } from "../server-functions/analize"
 import LighthouseError from "./LighthouseErrors"
 import { Monitor, Smartphone, Loader2 } from "lucide-react"
@@ -39,7 +42,6 @@ export default function Page() {
         return
       }
       setData(res)
-      console.log(res)
     })
   }, [url, device])
 
@@ -62,7 +64,43 @@ export default function Page() {
                 {isPending && <FallbackComponent url={url} device={device} />}
 
                 {data && "lighthouseMetrics" in data && (
-                  <SectionCards lighthouseMetrics={data?.lighthouseMetrics} />
+                  <>
+                    <Card className="mx-3 md:mx-6">
+                      <CardHeader>
+                        <CardTitle>
+                          Resultados de Lighthouse de la pagina:{" "}
+                          <a href={url} className="text-sky-400 underline">
+                            {url}
+                          </a>{" "}
+                          para{" "}
+                          <Badge variant={"outline"} className="text-sm">
+                            <Monitor className="inline h-4 w-4" />
+                            {device === "desktop" ? "Escritorio" : "Móvil"}
+                          </Badge>
+                        </CardTitle>
+                      </CardHeader>
+                    </Card>
+                    <SectionCards lighthouseMetrics={data?.lighthouseMetrics} />
+                    {data.response.lighthouseResult.audits && (
+                      <Screenshots
+                        lighthouseResult={data.response.lighthouseResult}
+                      />
+                    )}
+                    <ResourceSizePieChart
+                      resourceSummary={
+                        data.response.lighthouseResult.audits[
+                          "resource-summary"
+                        ]
+                      }
+                    />
+                    <MainThreadMetricsData
+                      mainThreadWorkBreakdown={
+                        data.response.lighthouseResult.audits[
+                          "mainthread-work-breakdown"
+                        ]
+                      }
+                    />
+                  </>
                 )}
                 {data && "code" in data && "message" in data && (
                   <LighthouseError runtimeError={data as RuntimeError} />
@@ -128,7 +166,7 @@ function FallbackComponent({ url, device }: { url: string; device: string }) {
         </CardContent>
       </Card>
       <div className="grid w-full grid-cols-1 gap-4 p-4 sm:grid-cols-2">
-        {Array.from({ length: 5 }).map((_, index) => (
+        {Array.from({ length: 6 }).map((_, index) => (
           <Skeleton key={index} className="h-48 w-full" />
         ))}
       </div>

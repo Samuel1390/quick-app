@@ -1,5 +1,5 @@
 import { type LighthouseMetrics } from "@/app/server-functions/analize"
-import { Zap, Timer, TableOfContents } from "lucide-react"
+import { Zap, Timer, TableOfContents, ServerCog } from "lucide-react"
 import { createElement } from "react"
 
 type Content = {
@@ -18,6 +18,7 @@ const METRIC_THRESHOLDS = {
   largest_contentful_paint_ms: { excellent: 1.5, good: 2.5, poor: 4 },
   total_blocking_time_ms: { excellent: 50, good: 200, poor: 400 }, // milisegundos
   time_to_interactive_ms: { excellent: 2, good: 3.8, poor: 7.3 },
+  network_server_latency_ms: { excellent: 100, good: 300, poor: 500 }, // milisegundos
 } as const
 
 type MetricKey = keyof typeof METRIC_THRESHOLDS
@@ -109,6 +110,22 @@ class LighthouseMetricsContent {
         lighthouseMetrics.time_to_interactive_ms
       ),
     }
+    this.network_server_latency_ms = {
+      value: lighthouseMetrics.network_server_latency_ms,
+      label: "Latencia del Servidor de Red",
+      abreviation: "NSL",
+      description:
+        "La latencia del servidor puede afectar el rendimiento. Si la latencia del servidor de origen es alta, indica que el servidor está sobrecargado o tiene un rendimiento deficiente en el backend.",
+      icon: createElement(ServerCog),
+      metricColorClass: getMetricColor(
+        "network_server_latency_ms",
+        lighthouseMetrics.network_server_latency_ms
+      ),
+      category: getMetricCategory(
+        "network_server_latency_ms",
+        lighthouseMetrics.network_server_latency_ms
+      ),
+    }
   }
 }
 
@@ -116,7 +133,7 @@ const getMetricColor = (key: MetricKey, strValue?: string): string | null => {
   if (!strValue) {
     return null
   }
-  const value = parseInt(strValue.replace(/ms|s/g, ""))
+  const value = parseFloat(strValue.replace(/ms|s/g, ""))
   const metric = METRIC_THRESHOLDS[key]
   if (value < metric.excellent) return METRIC_COLOR_CLASSES.excellent
   if (value < metric.good) return METRIC_COLOR_CLASSES.good

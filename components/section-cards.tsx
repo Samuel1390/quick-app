@@ -29,15 +29,16 @@ export function SectionCards({
   const lighthouseMetricsContent = new LighthouseMetricsContent({
     lighthouseMetrics,
   })
+  console.log(Object.keys(lighthouseMetricsContent))
   return (
     <div className="grid w-full grid-cols-1 gap-4 p-4 *:data-[slot=card]:shadow-xs sm:grid-cols-2 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-      {Object.keys(lighthouseMetricsContent).map((key) => {
+      {Object.keys(lighthouseMetrics).map((key) => {
         const metric =
           lighthouseMetricsContent[key as keyof typeof lighthouseMetricsContent]
         return (
           <Card
             key={key}
-            className={`bg-gradient-to-t ${!metric.value ? "from-neutral-300/50 to-red-400/20 dark:from-red-950/15 dark:to-red-800/50" : "from-primary/5 to-card dark:bg-card dark:from-transparent dark:to-transparent"}`}
+            className={`bg-gradient-to-t ${!metric?.value ? "from-neutral-300/50 to-red-400/20 dark:from-red-950/15 dark:to-red-800/50" : "from-primary/5 to-card dark:bg-card dark:from-transparent dark:to-transparent"}`}
           >
             <CardHeader>
               <CardDescription className="text-lg font-semibold text-neutral-950 dark:text-neutral-50">
