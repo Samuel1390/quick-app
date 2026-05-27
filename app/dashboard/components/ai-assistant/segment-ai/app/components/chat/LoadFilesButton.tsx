@@ -71,7 +71,7 @@ function LoadFilesButton({
                 }
               }}
             >
-              <Paperclip />
+              <Paperclip size={16} />
             </span>
           </Button>
         </HoverCardTrigger>

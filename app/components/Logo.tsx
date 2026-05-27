@@ -1,21 +1,26 @@
 import React from "react"
-
+import { cn } from "@/lib/utils"
 type Props = {
   label?: string
   showLabel?: boolean
-  props?: React.HTMLAttributes<HTMLDivElement>
 }
 
-const Logo = ({ label = "Quick-app", showLabel, ...props }: Props) => {
+const Logo = ({
+  className,
+  label = "Quick-app",
+  showLabel,
+  ...props
+}: React.ComponentProps<"div"> & Props) => {
   return (
-    <div className="flex items-center gap-2 rounded-lg" {...props}>
-      <div className="rounded-lg bg-linear-to-tl from-orange-500 to-yellow-400 p-2">
+    <div
+      className={cn("flex items-center gap-2 rounded-lg", className)}
+      {...props}
+    >
+      <div className="rounded-lg bg-linear-to-tl from-orange-500 to-yellow-400 p-1 sm:p-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="2rem"
-          height="2rem"
           viewBox="0 0 512 512"
-          className={"text-shadow text-shadow-lg"}
+          className={"text-shadow size-[1rem] text-shadow-lg sm:size-[2rem]"}
         >
           <path d="M0 0h512v512H0z" fill="none" />
           <path
@@ -33,7 +38,7 @@ const Logo = ({ label = "Quick-app", showLabel, ...props }: Props) => {
         </svg>
       </div>
       {showLabel || label !== "Quick-app" ? (
-        <span className="text-xl font-bold">{label}</span>
+        <span className="text-sm font-bold sm:text-xl">{label}</span>
       ) : null}
     </div>
   )

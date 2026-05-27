@@ -1,21 +1,25 @@
-import {
-  useState,
-  useActionState,
-  useEffect,
-  startTransition,
-  RefObject,
-  useCallback,
-  useRef,
-} from "react"
+import { useState, useEffect, RefObject, useCallback, useRef } from "react"
 import { ModelErrorType } from "../components/errors/BackendErrors"
-import ChatFormAction, {
-  GenericMessage,
-  HistoryData,
-} from "../server-actions/chatFormAction"
 import getModelObj from "../utils/getModelObj"
-import { GenericResponse } from "../server-actions/chatFormAction"
 import type { ModelHashes } from "../constants"
 import { nanoid } from "nanoid"
+
+// === TIPOS MIGRADOS DESDE EL ANTIGUO SERVER ACTION ===
+export type GenericMessage = {
+  role: "user" | "model"
+  content: string
+  reasoning?: string
+}
+
+export type HistoryData = {
+  prompt: string
+  files?: File[]
+  filesNames?: string[]
+  messageId: string
+  model: ModelHashes
+  supportsReasoning: boolean
+  messages: GenericMessage[]
+}
 
 export type LastUserMessage = {
   prompt: string
@@ -24,10 +28,6 @@ export type LastUserMessage = {
 }
 
 export function useChatState() {
-  const [state, action, isPending] = useActionState<GenericResponse, FormData>(
-    ChatFormAction,
-    []
-  )
   const [openErrorModal, setOpenErrorModal] = useState(false)
   const [errorCode, setErrorCode] = useState<ModelErrorType | null>(null)
   const [historyData, setHistoryData] = useState<HistoryData[]>([])
@@ -36,19 +36,12 @@ export function useChatState() {
     prompt: "",
   })
 
-  // === Streaming state ===
   const [isStreaming, setIsStreaming] = useState(false)
   const [streamingContent, setStreamingContent] = useState("")
   const [streamingModel, setStreamingModel] = useState<ModelHashes | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
 
-  useEffect(() => {
-    if ("error" in state) {
-      setOpenErrorModal(true)
-      setFeedbackMessage("Intenta cambiar de modelo, o espera un minuto")
-    }
-    setHistoryData(state as HistoryData[])
-  }, [state])
+  const isPending = isStreaming
 
   useEffect(() => {
     if (feedbackMessage) {
@@ -59,7 +52,6 @@ export function useChatState() {
 
   const setLastMessage = (msg: LastUserMessage) => setLastUserMessage(msg)
 
-  // === Streaming function para modelos Groq ===
   const sendStreamingMessage = useCallback(async (formData: FormData) => {
     const model = formData.get("model") as ModelHashes
     setIsStreaming(true)
@@ -71,6 +63,7 @@ export function useChatState() {
     abortControllerRef.current = abortController
 
     try {
+      // ENDPOINT CORREGIDO - Usa la ruta absoluta de tu API
       const response = await fetch("/api/chat", {
         method: "POST",
         body: formData,
@@ -126,14 +119,12 @@ export function useChatState() {
               reasoning = parsed.reasoning || " "
             }
           } catch {
-            // Ignorar líneas mal formateadas
+            // Ignorar
           }
         }
       }
 
-      // Stream terminado: agregar el mensaje completo al historyData
       const prompt = formData.get("prompt") as string
-      const model = formData.get("model") as ModelHashes
       const files = formData.getAll("files") as File[]
       const filesNames = files.map((f) => f.name)
       const historyDataRaw = formData.get("historyData") as string
@@ -187,13 +178,10 @@ export function useChatState() {
     if (lastUserMessage.files && lastUserMessage.files.length > 0) {
       lastUserMessage.files.forEach((file) => formData.append("files", file))
     }
-
     sendStreamingMessage(formData)
   }
 
   return {
-    state,
-    action,
     isPending,
     openErrorModal,
     setOpenErrorModal,
@@ -206,7 +194,6 @@ export function useChatState() {
     retry,
     historyData,
     setHistoryData,
-    // Streaming exports
     isStreaming,
     streamingContent,
     streamingModel,

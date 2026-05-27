@@ -20,7 +20,10 @@ const Footer = () => {
         <MagneticWrapper borderRadius={50} range={RANGE}>
           <HoverCard>
             <HoverCardTrigger asChild>
-              <CircleQuestionMark size={38} />
+              <CircleQuestionMark
+                size={38}
+                className="size-[26px] md:size-[38px]"
+              />
             </HoverCardTrigger>
             <HoverCardContent className="w-fit max-w-70 p-2">
               <div className="">
@@ -48,10 +51,10 @@ const Footer = () => {
                 <Link
                   href="https://github.com/Samuel1390"
                   target="_blank"
-                  className="group block rounded-full bg-gray-950 p-[6px] transition-colors hover:bg-white"
+                  className="group grid size-[26px] place-content-center rounded-full bg-gray-950 transition-colors hover:bg-white md:p-[20px]"
                 >
                   <BrandGithubFilledIcon
-                    className="size-[26px] fill-white stroke-none group-hover:fill-gray-950"
+                    className="size-[16px] fill-white stroke-none group-hover:fill-gray-950 md:size-[26px]"
                     size={26}
                   />
                 </Link>
@@ -79,7 +82,7 @@ const Footer = () => {
                     }
                     width={38}
                     height={38}
-                    className="rounded-full"
+                    className="size-[26px] rounded-full md:size-[38px]"
                   />
                 </Link>
               </HoverCardTrigger>

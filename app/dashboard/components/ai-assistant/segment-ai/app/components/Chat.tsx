@@ -14,8 +14,6 @@ const Chat = () => {
   const isOnline = useIsOnline()
 
   const {
-    state,
-    action,
     isPending,
     openErrorModal,
     setOpenErrorModal,
@@ -26,7 +24,6 @@ const Chat = () => {
     setLastMessage,
     retry,
     historyData,
-    // Streaming
     isStreaming,
     streamingContent,
     streamingModel,
@@ -47,70 +44,75 @@ const Chat = () => {
   } = useChatInput(setFeedbackMessage)
 
   function isFormAvailable([...extraConditions]: boolean[]): boolean {
-    // Esta funcion se encarga de validar si el formulario esta listo para ser enviado
     const isFilesAvailable =
       !(!modelObj.supportsFiles && form.files.length > 0) ||
       modelObj.supportsFiles
-
     const weHavePrompt = form.prompt.trim().length > 0
-
     const readyToSend = !(isPending || isStreaming || formLoading)
 
-    const isFormValid =
+    return (
       isFilesAvailable &&
       weHavePrompt &&
       extraConditions.every((v) => !!v) &&
       readyToSend
+    )
+  }
 
-    return isFormValid
+  const handleSubmit = (e?: React.FormEvent<HTMLFormElement>) => {
+    if (e) e.preventDefault()
+
+    if (!isOnline) {
+      setFeedbackMessage("Comprueba tu conexión a internet")
+      return
+    }
+
+    if (!formRef.current) return
+
+    // Generar el FormData manualmente para garantizar datos consistentes
+    const formData = new FormData(formRef.current)
+    form.files.forEach((file) => formData.append("files", file))
+
+    sendStreamingMessage(formData)
+
+    setLastMessage({
+      prompt: form.prompt,
+      files: form.files,
+      filesNames: form.files.map((file) => file.name),
+    })
+
+    handleFilesChange([])
+    clearPrompt()
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       if (isFormAvailable([])) {
         e.preventDefault()
-        if (!isOnline) {
-          setFeedbackMessage("Comprueba tu conexion a internet")
-          return
-        }
-        e.currentTarget.form?.requestSubmit()
-        clearPrompt()
+        handleSubmit() // Delegamos directamente al submit
       } else {
         e.preventDefault()
       }
     }
   }
 
-  const handleSubmit = () => {
-    setLastMessage({
-      prompt: form.prompt,
-      files: form.files,
-      filesNames: form.files.map((file) => file.name),
-    })
-    clearPrompt()
-  }
-
   return (
-    <>
+    <div className="fixed top-0 right-3 h-screen max-w-75 overflow-y-auto border-r border-l border-neutral-950 bg-white p-2 dark:border-neutral-50 dark:bg-black">
       <section
         className={cn(
-          `flex min-h-[0] w-full flex-1 flex-col items-center justify-start`
+          `flex min-h-[0] w-full flex-1 flex-col items-center justify-start px-2`
         )}
       >
-        {/* MODAL DE ERRORES | SE DISPARA CUANDO HAY UN ERROR EN EL SERVIDOR */}
         <Errors
-          code={errorCode ?? (state && "error" in state ? state.error : null)}
+          code={errorCode}
           open={openErrorModal}
           setOpen={setOpenErrorModal}
           onRetry={() => retry(formRef)}
         />
-
-        {/* Si hay un mensaje del usuario, se muestra el manager de modelos */}
         {lastUserMessage.prompt ? (
           <MessagesManager
             isPending={isPending}
             lastUserMessage={lastUserMessage}
-            hasError={!!errorCode || !!(state && "error" in state)}
+            hasError={!!errorCode}
             onRetry={() => retry(formRef)}
             historyData={historyData}
             isStreaming={isStreaming}
@@ -118,17 +120,14 @@ const Chat = () => {
             streamingModel={streamingModel}
           />
         ) : (
-          /* Si no hay un mensaje del usuario, se muestra el saludo inicial dandole la bienvenida a nuestro usuario*/
           <ChatGreeting />
         )}
       </section>
 
-      {/* FORMULARIO DE ENTRADA */}
       <ChatInputForm
         isOnline={isOnline}
         historyData={historyData}
         formRef={formRef}
-        action={action}
         handleSubmit={handleSubmit}
         handleKeyDown={handleKeyDown}
         prompt={form.prompt}
@@ -149,7 +148,7 @@ const Chat = () => {
         isStreaming={isStreaming}
         sendStreamingMessage={sendStreamingMessage}
       />
-    </>
+    </div>
   )
 }
 

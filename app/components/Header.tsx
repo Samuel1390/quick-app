@@ -15,19 +15,21 @@ import MagneticWrapper from "./MagneticWrapper"
 import Link from "next/link"
 import { docsSections } from "../dashboard/sections"
 const Header = () => {
-  const docsPath = "./dashboard?docs=true&"
+  const docsPath = "./dashboard?page="
   return (
     <header className="pointer-events-none fixed top-0 right-0 left-0 z-40 flex items-center justify-between p-4">
       <div>
         <MagneticWrapper borderRadius={14}>
-          <Logo showLabel />
+          <Logo className="p-1" showLabel />
         </MagneticWrapper>
       </div>
       <section className="pointer-events-auto flex items-center gap-4">
         <MagneticWrapper range={120} strength={0.2} borderRadius={12}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant={"link"}>Más acerca de rendimiento</Button>
+              <Button variant={"link"} className="text-md md:text-[1.2rem]">
+                Más acerca de rendimiento
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="max-w-70">
               <DropdownMenuGroup>
@@ -36,10 +38,10 @@ const Header = () => {
                   <Button
                     key={section.slug}
                     variant={"ghost"}
-                    className="w-full min-w-0 justify-start"
+                    className="w-full min-w-0 justify-start p-1 md:p-2"
                   >
                     <Link
-                      className="block w-full max-w-[200px]"
+                      className="block w-full max-w-[200px] p-0"
                       href={docsPath + section.slug}
                     >
                       <span className="block truncate text-start">

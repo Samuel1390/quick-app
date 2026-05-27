@@ -21,7 +21,7 @@ const Dashboard = ({
   return (
     <>
       {data && "lighthouseMetrics" in data && (
-        <>
+        <div className="flex min-w-[110%] flex-col gap-5">
           <Card>
             <CardHeader>
               <CardTitle>
@@ -56,7 +56,7 @@ const Dashboard = ({
               data.response.lighthouseResult.audits["layout-shifts"]
             }
           />
-        </>
+        </div>
       )}
       {data && "code" in data && "message" in data && (
         <LighthouseError runtimeError={data as RuntimeError} />
