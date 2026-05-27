@@ -1,20 +1,51 @@
+"use client"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
+import { urlRegex } from "../constants"
+import Dashboard from "./components/analysis-results/Dashboard"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import { useSearchParams } from "next/navigation"
 import { TooltipProvider } from "@/components/ui/tooltip"
-import FallbackComponent from "./components/FallbackComponent"
-import PerformanceData from "./components/PerformanceData"
-import { Suspense } from "react"
-import CannotAnalizePage from "./components/CannotAnalizePage"
-import { Loader2 } from "lucide-react"
+import { useTransition, useEffect, useState } from "react"
+import analize, { type ReturnValue } from "../server-functions/analize"
+import { DocsSection, docsSections } from "./sections"
+import * as React from "react"
+import MarkdownRenderer from "./components/MarkDownRenderer"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import Chat from "./components/ai-assistant/segment-ai/app/components/Chat"
+import { ErrorCard } from "./components/ErrorCard"
+import FallbackComponent from "./components/analysis-results/FallbackComponent"
+import LateralFilePreviewProvider from "./components/ai-assistant/segment-ai/app/components/context/LateralFilePreviewProvider"
+import ThemeProvider from "./components/ai-assistant/segment-ai/app/components/context/ThemeProvider"
+export default function Page() {
+  const searchParams = useSearchParams()
+  const url = searchParams.get("url")
+  const device = searchParams.get("device")
 
-type Props = {
-  searchParams: Promise<{ url?: string; device?: string }>
-}
+  const isValidUrl = urlRegex.test(url || "")
+  const isValidDevice = device === "desktop" || device === "mobile"
 
-export default async function Page({ searchParams }: Props) {
-  const { url, device: rawDevice } = await searchParams
-  const device = rawDevice || "desktop"
+  let errorReason: "invalid-url" | "invalid-device" | "both" | null = null
+  if (!isValidUrl && !isValidDevice) errorReason = "both"
+  else if (!isValidUrl) errorReason = "invalid-url"
+  else if (!isValidDevice) errorReason = "invalid-device"
+
+  // Si no hay error, continuar con el análisis
+  const [isPending, startTransition] = useTransition()
+  const [data, setData] = useState<ReturnValue>(null)
+  const [selectedSection, setSelectedSection] = useState<DocsSection | null>(
+    null
+  )
+
+  useEffect(() => {
+    if (errorReason || !url || !device) return
+    startTransition(async () => {
+      const res: ReturnValue = await analize(url, device)
+      if (!res) return
+      setData(res)
+    })
+  }, [url, device])
+
   return (
     <SidebarProvider
       style={
@@ -25,34 +56,38 @@ export default async function Page({ searchParams }: Props) {
       }
     >
       <TooltipProvider>
-        <AppSidebar variant="inset" />
+        <AppSidebar
+          docs={docsSections}
+          selectedSection={selectedSection}
+          setSelectedSection={setSelectedSection}
+        />
         <SidebarInset>
           <SiteHeader />
           <div className="flex flex-1 flex-col">
             <div className="@container/main flex flex-1 flex-col gap-2">
-              <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-                {url ? (
-                  <Suspense
-                    fallback={<FallbackComponent url={url} device={device} />}
-                  >
-                    <PerformanceData
-                      searchParams={{
-                        url,
-                        device,
-                      }}
-                    />
-                  </Suspense>
-                ) : (
-                  <Suspense
-                    fallback={
-                      <div className="flex justify-center p-10">
-                        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                      </div>
-                    }
-                  >
-                    <CannotAnalizePage url={url} device={device} />
-                  </Suspense>
+              <div className="mx-3 flex flex-col gap-4 py-4 md:mx-6 md:gap-6 md:py-6">
+                {/*isPending && !errorReason && url && device && (
+                  <FallbackComponent url={url!} device={device} />
                 )}
+                {selectedSection ? (
+                  <MarkdownRenderer
+                    selectedSection={selectedSection}
+                    setSelectedSection={setSelectedSection}
+                  />
+                ) : !errorReason && url && device ? (
+                  <Dashboard data={data} url={url!} device={device} />
+                ) : (
+                  <ErrorCard
+                    reason={errorReason || "invalid-url"}
+                    currentUrl={url || ""}
+                    currentDevice={device || ""}
+                  />
+                )*/}
+                <LateralFilePreviewProvider>
+                  <ThemeProvider>
+                    <Chat />
+                  </ThemeProvider>
+                </LateralFilePreviewProvider>
               </div>
             </div>
           </div>

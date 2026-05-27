@@ -1,3 +1,6 @@
+// este es el tipo de respuesta que devuelve la api de page speed instgths
+// https://developers.google.com/speed/docs/insights/rest?hl=es-419
+
 export interface Root {
   captchaResult: string
   kind: string

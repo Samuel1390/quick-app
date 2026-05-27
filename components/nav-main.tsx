@@ -8,47 +8,51 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { CirclePlusIcon, MailIcon } from "lucide-react"
+import type { DocsSection } from "@/app/dashboard/sections"
 
 export function NavMain({
+  selectedSection,
+  setSelectedSection,
   items,
 }: {
-  items: {
-    title: string
-    url: string
-    icon?: React.ReactNode
-  }[]
+  items: DocsSection[]
+  selectedSection: any
+  setSelectedSection: any
 }) {
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
-        <SidebarMenu>
-          <SidebarMenuItem className="flex items-center gap-2">
-            <SidebarMenuButton
-              tooltip="Quick Create"
-              className="min-w-8 bg-primary text-primary-foreground duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
-            >
-              <CirclePlusIcon
-              />
-              <span>Quick Create</span>
-            </SidebarMenuButton>
-            <Button
-              size="icon"
-              className="size-8 group-data-[collapsible=icon]:opacity-0"
-              variant="outline"
-            >
-              <MailIcon
-              />
-              <span className="sr-only">Inbox</span>
-            </Button>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <SidebarMenuItem className="px-3 text-muted-foreground">
+          Documentos
+        </SidebarMenuItem>
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton tooltip={item.title}>
-                {item.icon}
-                <span>{item.title}</span>
+              <SidebarMenuButton
+                className="p-0"
+                tooltip={item.title}
+                onClick={() => setSelectedSection(item)}
+                asChild
+              >
+                <Button
+                  className={`w-full justify-start truncate px-2 ${selectedSection && selectedSection.slug === item.slug ? "hover:bg-primary hover:text-background" : ""}`}
+                  variant={
+                    selectedSection && selectedSection.slug === item.slug
+                      ? "default"
+                      : "ghost"
+                  }
+                >
+                  {item.icon}
+                  <span
+                    style={{
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {item.title}
+                  </span>
+                </Button>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}

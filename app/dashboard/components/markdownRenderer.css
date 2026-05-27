@@ -1,0 +1,171 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+/* Estilos Base */
+
+/*
+  El selector .output es para el modo claro por defecto.
+  Se asegura que el texto sea oscuro y el fondo claro.
+*/
+.output {
+  --bg-color: #ffffff;
+  --text-color: #222222;
+  --heading-color: #111827;
+  --border-color: #e5e7eb;
+  --code-bg: #f3f4f6;
+  --pre-bg: #1f2937;
+  --quote-bg: #eff6ff;
+  --quote-border: #3b82f6;
+  --link-color: #2563eb;
+  --table-zebra: #f9fafb;
+
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.6;
+  width: 100%;
+  margin: 0 auto;
+  overflow-x: hidden;
+}
+
+/* Modo Oscuro (Negro Absoluto) */
+:where(.dark) .output {
+  --bg-color: #0a0a0a;
+  --text-color: #d1d5db;
+  --heading-color: #ffffff;
+  --border-color: #262626;
+  --code-bg: #1a1a1a;
+  --pre-bg: #0a0a0a;
+  --quote-bg: #111827;
+  --quote-border: #3b82f6;
+  --link-color: #60a5fa;
+  --table-zebra: #0a0a0a;
+}
+
+.output h1,
+.output h2,
+.output h3,
+.output h4,
+.output h5,
+.output h6 {
+  margin-block: 1.2rem;
+  color: var(--heading-color);
+}
+
+.output p {
+  margin-block: 1rem;
+  color: var(--text-color);
+}
+.output ol > li {
+  list-style-type: disc;
+  margin-left: 1rem;
+  color: var(--text-color);
+}
+.output ul > li {
+  list-style-type: decimal;
+  margin-left: 1rem;
+  color: var(--text-color);
+}
+.output ol,
+.output ul {
+  margin-left: 0.5rem;
+}
+
+/* --- OPTIMIZACIÓN DE TABLAS --- */
+
+/* Contenedor para scroll horizontal (debes envolver la tabla en un div en React) */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin: 2rem 0;
+}
+
+.output table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  background-color: var(--bg-color);
+  overflow-x: auto;
+}
+
+.output th {
+  background-color: var(--code-bg);
+  color: var(--heading-color);
+  font-weight: 600;
+  text-align: left;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.output th,
+.output td {
+  padding: 1rem 1.25rem; /* Más espacio interno */
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+}
+
+/* Efecto Zebra para separar filas visualmente */
+
+.output tr:nth-child(even) {
+  background-color: var(--table-zebra);
+}
+
+/* Efecto hover para no perderse en tablas grandes */
+
+.output tr:hover {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+/* Quitar bordes externos de la tabla si el wrapper ya los tiene */
+/* Asegura que el texto fuerte también sea visible en ambos modos */
+.output table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.output p,
+.output strong {
+  margin-block: 10px;
+  padding-block: 10px;
+  color: var(--text-color);
+}
+/* --- OPTIMIZACIÓN MATEMÁTICAS (KATEX) --- */
+
+.output .katex {
+  padding-inline: 10px !important;
+  font-size: 1.2em !important;
+  margin-block: 1rem !important;
+  display: inline-block !important;
+  color: var(--text-color);
+}
+
+/* Las fórmulas en bloque (centradas) se ven aún más grandes para resaltar */
+
+.output .katex-display {
+  font-size: 1.2em !important;
+  margin-block: 1rem !important;
+  display: block !important;
+  margin-inline: auto !important;
+  padding-inline: 10px;
+  padding-block: 20px;
+  overflow-x: auto !important;
+  color: var(--text-color);
+}
+.output .katex-display > .katex {
+  /* Asegurar que el contenido interno respete el scroll */
+  white-space: normal;
+}
+/* Ajuste para fórmulas químicas */
+.output .ce {
+  font-family: inherit; /* Mantiene la fuente del texto pero recta */
+  letter-spacing: 0.02em;
+}
+
+/* Las flechas de reacción a veces necesitan espacio extra */
+.output .katex .react-arrow {
+  margin: 0 0.5rem;
+}
+
+.output pre {
+  padding: 0;
+}
+.output pre > div {
+  padding: 0;
+  margin: 0;
+}

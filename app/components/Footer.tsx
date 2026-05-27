@@ -20,13 +20,7 @@ const Footer = () => {
         <MagneticWrapper borderRadius={50} range={RANGE}>
           <HoverCard>
             <HoverCardTrigger asChild>
-              <Link
-                href="https://github.com/Samuel1390"
-                target="_blank"
-                className="group block rounded-full opacity-80 transition-opacity hover:opacity-100"
-              >
-                <CircleQuestionMark size={38} />
-              </Link>
+              <CircleQuestionMark size={38} />
             </HoverCardTrigger>
             <HoverCardContent className="w-fit max-w-70 p-2">
               <div className="">
@@ -96,12 +90,12 @@ const Footer = () => {
                     src={
                       "https://avatars.githubusercontent.com/u/195463641?v=4"
                     }
-                    width={95}
-                    height={95}
+                    width={130}
+                    height={130}
                     className="rounded-full"
                   />
                   <div>
-                    <h2 className="text-md font-semibold">Samuel Nelo</h2>
+                    <h2 className="text-lg font-semibold">Samuel Nelo</h2>
                     <p className="text-sm text-muted-foreground">
                       Portfolio de Samuel Nelo, desarrollador del proyecto.
                       ¡Explora y descubre más sobre mi trabajo!
