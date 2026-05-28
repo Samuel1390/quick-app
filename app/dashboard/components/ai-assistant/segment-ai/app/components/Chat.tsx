@@ -96,10 +96,10 @@ const Chat = () => {
   }
 
   return (
-    <div className="fixed top-0 right-3 h-screen max-w-75 overflow-y-auto border-r border-l border-neutral-950 bg-white p-2 dark:border-neutral-50 dark:bg-black">
+    <div className="fixed top-0 right-0 z-600 h-screen max-w-75 overflow-y-auto border-r border-l border-neutral-950 bg-white p-2 dark:border-neutral-50 dark:bg-black">
       <section
         className={cn(
-          `flex min-h-[0] w-full flex-1 flex-col items-center justify-start px-2`
+          `flex min-h-[calc(100vh_-_10.5rem)] w-full flex-1 flex-col items-center justify-start px-2`
         )}
       >
         <Errors

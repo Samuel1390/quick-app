@@ -34,7 +34,7 @@ export function AppSidebar({
   }, [selectedSection])
   return (
     <Sidebar collapsible="offcanvas" {...props}>
-      <SidebarHeader>
+      <SidebarHeader className="sticky top-0 z-500">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="">
