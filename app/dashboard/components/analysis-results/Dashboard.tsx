@@ -21,7 +21,7 @@ const Dashboard = ({
   return (
     <>
       {data && "lighthouseMetrics" in data && (
-        <div className="flex min-w-[110%] flex-col gap-5">
+        <div className="flex w-full flex-col gap-5">
           <Card>
             <CardHeader>
               <CardTitle>

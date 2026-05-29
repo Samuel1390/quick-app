@@ -99,7 +99,7 @@ const MarkdownRenderer = ({ content, historyData }: Props) => {
       </ReactMarkdown>
       {/* Footer de la respuesta del modelo | contiene informacion adicional */}
       <div className="mt-4 flex items-center justify-between gap-2 border-t-2 border-neutral-300 py-4 pt-3 dark:border-neutral-700">
-        <div className="text-md flex items-center gap-1 text-neutral-500 max-sm:text-sm dark:text-neutral-400">
+        <div className="flex items-center gap-1 text-[0.7rem] text-neutral-500 dark:text-neutral-400">
           Modelo: {modelObj.label}
           {modelObj?.icon && modelObj.icon}
         </div>

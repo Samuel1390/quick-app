@@ -2,7 +2,6 @@
 import React, { useEffect } from "react"
 import { cn } from "@/lib/utils"
 import { FileIcon, X } from "lucide-react"
-import useFilePreview from "../../hooks/useFilePreview"
 import { getIcon } from "omni-file"
 import Image from "next/image"
 import {
@@ -20,27 +19,6 @@ const Attachments = ({
   setForm: (form: any) => void
   modelObj: any
 }) => {
-  const {
-    file: currentFileOnPreview,
-    setFile,
-    isLateralFilePreviewOpen,
-    setIsLateralFilePreviewOpen,
-    setFilesOnForm,
-  } = useFilePreview()
-
-  useEffect(() => {
-    setFilesOnForm(files)
-  }, [files])
-
-  const handleFileClick = (file: File) => {
-    setFile(file)
-    if (currentFileOnPreview === file && isLateralFilePreviewOpen) {
-      setIsLateralFilePreviewOpen(false)
-    } else {
-      setIsLateralFilePreviewOpen(true)
-    }
-  }
-
   const handleRemoveFile = (
     event: React.MouseEvent<HTMLButtonElement>,
     i: number
@@ -62,7 +40,6 @@ const Attachments = ({
         <HoverCard key={`${file.name}-${i}`}>
           <HoverCardTrigger>
             <div
-              onClick={() => handleFileClick(file)}
               className={cn(
                 `flex items-center gap-2 border font-semibold hover:cursor-pointer`,
                 `rounded-md px-3 py-1 text-sm`,
@@ -89,7 +66,7 @@ const Attachments = ({
               </button>
             </div>
           </HoverCardTrigger>
-          <HoverCardContent>
+          <HoverCardContent side="top" className="z-620">
             <span>Ver contenido de {file.name}</span>
           </HoverCardContent>
         </HoverCard>

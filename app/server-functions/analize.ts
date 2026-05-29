@@ -39,7 +39,6 @@ export default async function analize(
   }
 
   try {
-    console.log(url.toString())
     const response = await fetch(url, {
       next: {
         revalidate: 600,

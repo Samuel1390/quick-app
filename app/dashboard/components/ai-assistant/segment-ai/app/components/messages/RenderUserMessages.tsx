@@ -2,7 +2,6 @@
 import { RetryIcon } from "@/components/icons/pajamas-retry"
 import { Ref } from "react"
 import { LastUserMessage } from "../../hooks/useChatState"
-import useFilePreview from "../../hooks/useFilePreview"
 import { FileIcon } from "lucide-react"
 import {
   HoverCard,
@@ -25,13 +24,6 @@ const RenderUserMessage = ({
   retry,
   ref,
 }: RenderUserMessageProps) => {
-  const {
-    setFile,
-    isLateralFilePreviewOpen,
-    setIsLateralFilePreviewOpen,
-    file: CurrentFileOnPreview,
-  } = useFilePreview()
-
   return (
     <div className="mb-4 flex w-full flex-col items-end gap-1" ref={ref}>
       {/* CONTENEDOR PARA EL MENSAJE DEL USUARIO */}
@@ -53,20 +45,7 @@ const RenderUserMessage = ({
           userMessage.files.map((file, i) => (
             <HoverCard key={`${i}-${file.name}-${file.size}`}>
               <HoverCardTrigger>
-                <div
-                  onClick={() => {
-                    if (
-                      CurrentFileOnPreview === file &&
-                      isLateralFilePreviewOpen
-                    ) {
-                      setIsLateralFilePreviewOpen(false)
-                    } else {
-                      setIsLateralFilePreviewOpen(true)
-                    }
-                    setFile(file)
-                  }}
-                  className="sm:text-md mt-1 flex cursor-pointer items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-sm text-xs font-medium text-blue-600 transition-colors hover:bg-blue-100 sm:flex-row dark:border-blue-900/50 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-900/50"
-                >
+                <div className="sm:text-md mt-1 flex cursor-pointer items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-sm text-xs font-medium text-blue-600 transition-colors hover:bg-blue-100 sm:flex-row dark:border-blue-900/50 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-900/50">
                   {getIcon(file.name) ? (
                     <Image
                       src={`/icons/${getIcon(file.name)}.svg`}

@@ -76,7 +76,7 @@ export default function ChatInputForm({
         value={prompt}
         onChange={handleChange}
         name={"prompt"}
-        className="max-h-30 min-h-20 w-full overflow-y-auto text-sm md:text-[1rem]"
+        className="max-h-24 min-h-12 w-full overflow-y-auto text-sm"
         onKeyDown={handleKeyDown}
         placeholder="Pregunta a Segment"
       />
@@ -87,14 +87,14 @@ export default function ChatInputForm({
         value={JSON.stringify(historyData)}
       />
       <div className="flex h-7 w-full items-center justify-between px-1 py-7">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <ModelsSelect model={model} setModel={setModel} modelObj={modelObj} />
           <LoadFilesButton
             files={files}
-            modelObj={modelObj}
-            setFeedbackMessage={setFeedbackMessage}
             handleFilesChange={handleFilesChange}
+            modelObj={modelObj}
             model={model}
+            setFeedbackMessage={setFeedbackMessage}
           />
         </div>
         <div className="max-sm:gap-1/2 flex items-center gap-1 max-sm:scale-90">

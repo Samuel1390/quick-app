@@ -19,13 +19,52 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Chat from "./components/ai-assistant/segment-ai/app/components/Chat"
 import { ErrorCard } from "./components/ErrorCard"
 import FallbackComponent from "./components/analysis-results/FallbackComponent"
-import LateralFilePreviewProvider from "./components/ai-assistant/segment-ai/app/components/context/LateralFilePreviewProvider"
 import ThemeProvider from "./components/ai-assistant/segment-ai/app/components/context/ThemeProvider"
-import { useParams } from "next/navigation"
+import { SegmentChatProvider } from "./components/ai-assistant/segment-ai/app/components/context/SegmentChatProvider"
+import { useSegmentChat } from "./components/ai-assistant/segment-ai/app/components/context/SegmentChatContext"
+
+// ── Componente interno que adapta el layout según el estado del chat ──────────
+function DashboardLayout({
+  children,
+  sidebar,
+}: {
+  children: React.ReactNode
+  sidebar: React.ReactNode
+}) {
+  const chatCtx = useSegmentChat()
+  const isChatOpen = chatCtx?.isChatOpen ?? false
+
+  return (
+    <SidebarProvider
+      style={
+        {
+          "--sidebar-width": "calc(var(--spacing) * 72)",
+          "--header-height": "calc(var(--spacing) * 12)",
+        } as React.CSSProperties
+      }
+    >
+      <TooltipProvider>
+        {sidebar}
+        <SidebarInset
+          /* cuando la pantalla es muy grande el chat se estira un poco mas cuando esta abierto*/
+          className={
+            isChatOpen ? "hidden pr-[18.25rem] sm:block 2xl:pr-[25rem]" : ""
+          }
+          style={{
+            transition: "padding-right 300ms ease-in-out",
+          }}
+        >
+          {children}
+        </SidebarInset>
+      </TooltipProvider>
+    </SidebarProvider>
+  )
+}
+
+// ── Página principal ──────────────────────────────────────────────────────────
 export default function Page() {
   const searchParams = useSearchParams()
   const url = searchParams.get("url")
@@ -40,12 +79,12 @@ export default function Page() {
   else if (!isValidUrl) errorReason = "invalid-url"
   else if (!isValidDevice) errorReason = "invalid-device"
 
-  // Si no hay error, continuar con el análisis
   const [isPending, startTransition] = useTransition()
   const [data, setData] = useState<ReturnValue>(null)
   const [selectedSection, setSelectedSection] = useState<DocsSection | null>(
     null
   )
+
   useEffect(() => {
     const selectedSectionByParameters = docsSections.find(
       (sec) => sec.slug === paramDoc
@@ -65,80 +104,79 @@ export default function Page() {
   }, [url, device])
 
   return (
-    <div>
-      <SidebarProvider
-        style={
-          {
-            "--sidebar-width": "calc(var(--spacing) * 72)",
-            "--header-height": "calc(var(--spacing) * 12)",
-          } as React.CSSProperties
-        }
-      >
-        <TooltipProvider>
-          <AppSidebar
-            docs={docsSections}
-            selectedSection={selectedSection}
-            setSelectedSection={setSelectedSection}
-          />
-          <SidebarInset>
-            <SiteHeader>
-              <Breadcrumb>
-                <BreadcrumbList>
+    <SegmentChatProvider data={data} url={url ?? ""} device={device ?? ""}>
+      <div className="relative">
+        <DashboardLayout
+          sidebar={
+            <AppSidebar
+              docs={docsSections}
+              selectedSection={selectedSection}
+              setSelectedSection={setSelectedSection}
+            />
+          }
+        >
+          <SiteHeader>
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/">Inicio</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                {selectedSection ? (
                   <BreadcrumbItem>
-                    <BreadcrumbLink href="/">Inicio</BreadcrumbLink>
+                    <BreadcrumbLink
+                      href={`/${selectedSection.slug}?url=${url}&device=${device}`}
+                    >
+                      {selectedSection.title}
+                    </BreadcrumbLink>
                   </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                  {selectedSection ? (
-                    <BreadcrumbItem>
-                      <BreadcrumbLink
-                        href={`/${selectedSection.slug}?url=${url}&device=${device}`}
-                      >
-                        {selectedSection.title}
-                      </BreadcrumbLink>
-                    </BreadcrumbItem>
-                  ) : (
-                    <BreadcrumbItem>
-                      <BreadcrumbLink
-                        href={`/dashboard?url=${url}&device=${device}`}
-                      >
-                        Resultados del análisis
-                      </BreadcrumbLink>
-                    </BreadcrumbItem>
-                  )}
-                </BreadcrumbList>
-              </Breadcrumb>
-            </SiteHeader>
-            <div className="flex flex-1 flex-col">
-              <div className="@container/main flex flex-1 flex-col gap-2">
-                <div className="mx-3 flex max-w-140 gap-4 py-4 md:mx-6 md:gap-6 md:py-6">
-                  {isPending && !errorReason && url && device && (
+                ) : (
+                  <BreadcrumbItem>
+                    <BreadcrumbLink
+                      href={`/dashboard?url=${url}&device=${device}`}
+                    >
+                      Resultados del análisis
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                )}
+              </BreadcrumbList>
+            </Breadcrumb>
+          </SiteHeader>
+
+          <div className="flex flex-1 flex-col">
+            <div className="@container/main flex flex-1 flex-col gap-2">
+              <div className="mx-3 flex gap-4 py-4 md:mx-6 md:gap-6 md:py-6">
+                {isPending &&
+                  !errorReason &&
+                  url &&
+                  device &&
+                  !selectedSection && (
                     <FallbackComponent url={url!} device={device} />
                   )}
-                  {selectedSection ? (
-                    <MarkdownRenderer
-                      selectedSection={selectedSection}
-                      setSelectedSection={setSelectedSection}
-                    />
-                  ) : !errorReason && url && device ? (
-                    <Dashboard data={data} url={url!} device={device} />
-                  ) : (
-                    <ErrorCard
-                      reason={errorReason || "invalid-url"}
-                      currentUrl={url || ""}
-                      currentDevice={device || ""}
-                    />
-                  )}
-                </div>
+                {selectedSection ? (
+                  <MarkdownRenderer
+                    selectedSection={selectedSection}
+                    setSelectedSection={setSelectedSection}
+                  />
+                ) : !errorReason && url && device ? (
+                  <Dashboard data={data} url={url!} device={device} />
+                ) : (
+                  <ErrorCard
+                    reason={errorReason || "invalid-url"}
+                    currentUrl={url || ""}
+                    currentDevice={device || ""}
+                  />
+                )}
               </div>
             </div>
-          </SidebarInset>
-        </TooltipProvider>
-      </SidebarProvider>
-      <LateralFilePreviewProvider>
+          </div>
+        </DashboardLayout>
+
+        {/* Chat de Segment AI — slide desde la derecha */}
         <ThemeProvider>
           <Chat />
         </ThemeProvider>
-      </LateralFilePreviewProvider>
-    </div>
+      </div>
+    </SegmentChatProvider>
   )
 }

@@ -1,12 +1,12 @@
-import Logo from "../Logo";
-import { cn } from "@/lib/utils";
+import Logo from "../Logo"
+import { cn } from "@/lib/utils"
 
 export default function ChatGreeting() {
   return (
     <div
       className={cn(
-        "flex flex-col h-fit text-center",
-        "items-center justify-center",
+        "flex h-fit flex-col text-center",
+        "items-center justify-center"
       )}
     >
       <Logo size={60} className="mt-15" />
@@ -16,17 +16,15 @@ export default function ChatGreeting() {
           "md:text-md",
           "text-neutral-700",
           "dark:text-neutral-300",
-          "font-bold",
+          "font-bold"
         )}
       >
-        ¡Hola! ¿En qué puedo ayudarte hoy?
+        ¡Comencemos a optimizar tu sitio web!
       </p>
-      <p className="max-w-100 dark:text-neutral-400 text-[0.8rem] mt-10 text-neutral-600">
-        Segment es un asistente de IA especializado en ciencias de nivel
-        superior, tales como computación, matemáticas, física, biología,
-        ingeniería y química. Solo escribe en el campo de texto y envía tu
-        mensaje; Segment te responderá al instante.
+      <p className="mt-10 max-w-100 text-[0.8rem] text-neutral-600 dark:text-neutral-400">
+        Segment es un asistente de IA especializado que te ayudará a optimizar
+        el rendimiento de tu aplicación
       </p>
     </div>
-  );
+  )
 }

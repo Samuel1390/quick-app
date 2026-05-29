@@ -50,7 +50,7 @@ const ModelsSelect = ({
       </SelectTrigger>
       <SelectContent
         onMouseDown={(e) => e.preventDefault()}
-        className="popper -top-10"
+        className="popper -top-10 z-610 max-w-60"
       >
         <SelectGroup>
           {/* MAPEO DE MODELOS */}

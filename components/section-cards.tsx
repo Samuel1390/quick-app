@@ -29,7 +29,6 @@ export function SectionCards({
   const lighthouseMetricsContent = new LighthouseMetricsContent({
     lighthouseMetrics,
   })
-  console.log(Object.keys(lighthouseMetricsContent))
   return (
     <div className="grid w-full grid-cols-1 gap-4 *:data-[slot=card]:shadow-xs sm:grid-cols-2 @xl/main:grid-cols-2">
       {Object.keys(lighthouseMetrics).map((key) => {
