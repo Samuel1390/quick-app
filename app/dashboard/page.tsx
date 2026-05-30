@@ -8,7 +8,7 @@ import { useWindowSize } from "../hooks/useWindowResize"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { useSearchParams } from "next/navigation"
 import { TooltipProvider } from "@/components/ui/tooltip"
-import { useTransition, useEffect, useState } from "react"
+import { useTransition, useEffect, useState, Suspense } from "react" // Añadido Suspense
 import analize, { type ReturnValue } from "../server-functions/analize"
 import { DocsSection, docsSections } from "./sections"
 import * as React from "react"
@@ -18,7 +18,6 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import Chat from "./components/ai-assistant/segment-ai/app/components/Chat"
@@ -41,14 +40,15 @@ function DashboardLayout({
   const chatCtx = useSegmentChat()
   const isChatOpen = chatCtx?.isChatOpen ?? false
   const isLess = useRef<boolean>(width ? width < CLOSE_CHAT_BREAKPOINT : false)
+
   useEffect(() => {
     if (isLess.current && isChatOpen && chatCtx) {
       chatCtx.toggleChat()
     }
-  }, [isLess.current])
+  }, [isLess.current, isChatOpen, chatCtx])
+
   useEffect(() => {
     if (width) isLess.current = width < CLOSE_CHAT_BREAKPOINT
-    console.log(isLess.current)
   }, [width])
 
   return (
@@ -63,7 +63,6 @@ function DashboardLayout({
       <TooltipProvider>
         {sidebar}
         <SidebarInset
-          /* cuando la pantalla es muy grande el chat se estira un poco mas cuando esta abierto*/
           className={
             isChatOpen ? "hidden pr-[18.25rem] sm:block 2xl:pr-[25rem]" : ""
           }
@@ -78,8 +77,8 @@ function DashboardLayout({
   )
 }
 
-// ── Página principal ──────────────────────────────────────────────────────────
-export default function Page() {
+// ── Componente lógico aislado (Requiere estar dentro de Suspense) ─────────────
+function DashboardContent() {
   const searchParams = useSearchParams()
   const url = searchParams.get("url")
   const device = searchParams.get("device")
@@ -116,7 +115,7 @@ export default function Page() {
       if (!res) return
       setData(res)
     })
-  }, [url, device])
+  }, [url, device, errorReason])
 
   return (
     <SegmentChatProvider data={data} url={url ?? ""} device={device ?? ""}>
@@ -193,5 +192,21 @@ export default function Page() {
         <Chat />
       </div>
     </SegmentChatProvider>
+  )
+}
+
+// ── Página principal exportada ────────────────────────────────────────────────
+export default function Page() {
+  return (
+    // El límite de suspensión protege al compilador de Node.js de la falta de contexto del Router
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen w-full items-center justify-center bg-neutral-950 text-neutral-400">
+          Cargando entorno...
+        </div>
+      }
+    >
+      <DashboardContent />
+    </Suspense>
   )
 }
