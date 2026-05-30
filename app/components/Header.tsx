@@ -27,7 +27,7 @@ const Header = () => {
         <MagneticWrapper range={120} strength={0.2} borderRadius={12}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant={"link"} className="text-sm md:text-[1.2rem]">
+              <Button variant={"link"} className="text-[0.8rem] md:text-[1rem]">
                 Más acerca de rendimiento
               </Button>
             </DropdownMenuTrigger>

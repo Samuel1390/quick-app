@@ -6,7 +6,7 @@ import { Monitor, Smartphone, Loader2 } from "lucide-react"
 
 function FallbackComponent({ url, device }: { url: string; device: string }) {
   return (
-    <div className="flex min-w-[112%] flex-col gap-4">
+    <div className="flex w-full flex-col gap-4">
       <Card>
         <CardHeader>
           <CardTitle>

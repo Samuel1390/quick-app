@@ -129,7 +129,7 @@ const Chat = () => {
     >
       <section
         className={cn(
-          `flex min-h-[calc(100vh_-_11.5rem)] w-full flex-1 flex-col items-center justify-start px-2 2xl:min-h-[calc(100vh_-_10.2rem)]`
+          `flex w-full flex-1 flex-col items-center justify-start px-2`
         )}
       >
         <section className="sticky top-0 z-50 flex w-full items-center bg-neutral-50/50 backdrop-blur-sm sm:hidden dark:bg-neutral-950/50">

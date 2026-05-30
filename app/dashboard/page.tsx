@@ -3,6 +3,7 @@ import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
 import { urlRegex } from "../constants"
 import Dashboard from "./components/analysis-results/Dashboard"
+import { useWindowSize } from "../hooks/useWindowResize"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { useSearchParams } from "next/navigation"
 import { TooltipProvider } from "@/components/ui/tooltip"
@@ -22,9 +23,9 @@ import {
 import Chat from "./components/ai-assistant/segment-ai/app/components/Chat"
 import { ErrorCard } from "./components/ErrorCard"
 import FallbackComponent from "./components/analysis-results/FallbackComponent"
-import ThemeProvider from "./components/ai-assistant/segment-ai/app/components/context/ThemeProvider"
 import { SegmentChatProvider } from "./components/ai-assistant/segment-ai/app/components/context/SegmentChatProvider"
 import { useSegmentChat } from "./components/ai-assistant/segment-ai/app/components/context/SegmentChatContext"
+import { useRef } from "react"
 
 // ── Componente interno que adapta el layout según el estado del chat ──────────
 function DashboardLayout({
@@ -34,8 +35,20 @@ function DashboardLayout({
   children: React.ReactNode
   sidebar: React.ReactNode
 }) {
+  const CLOSE_CHAT_BREAKPOINT = 1164 // px
+  const { width } = useWindowSize()
   const chatCtx = useSegmentChat()
   const isChatOpen = chatCtx?.isChatOpen ?? false
+  const isLess = useRef<boolean>(width ? width < CLOSE_CHAT_BREAKPOINT : false)
+  useEffect(() => {
+    if (isLess.current && isChatOpen && chatCtx) {
+      chatCtx.toggleChat()
+    }
+  }, [isLess.current])
+  useEffect(() => {
+    if (width) isLess.current = width < CLOSE_CHAT_BREAKPOINT
+    console.log(isLess.current)
+  }, [width])
 
   return (
     <SidebarProvider
@@ -70,6 +83,7 @@ export default function Page() {
   const url = searchParams.get("url")
   const device = searchParams.get("device")
   const paramDoc = searchParams.get("page")
+  const { width } = useWindowSize()
 
   const isValidUrl = urlRegex.test(url || "")
   const isValidDevice = device === "desktop" || device === "mobile"
@@ -117,29 +131,31 @@ export default function Page() {
         >
           <SiteHeader>
             <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/">Inicio</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                {selectedSection ? (
+              {width && width >= 800 && (
+                <BreadcrumbList>
                   <BreadcrumbItem>
-                    <BreadcrumbLink
-                      href={`/${selectedSection.slug}?url=${url}&device=${device}`}
-                    >
-                      {selectedSection.title}
-                    </BreadcrumbLink>
+                    <BreadcrumbLink href="/">Inicio</BreadcrumbLink>
                   </BreadcrumbItem>
-                ) : (
-                  <BreadcrumbItem>
-                    <BreadcrumbLink
-                      href={`/dashboard?url=${url}&device=${device}`}
-                    >
-                      Resultados del análisis
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                )}
-              </BreadcrumbList>
+                  <BreadcrumbSeparator />
+                  {selectedSection ? (
+                    <BreadcrumbItem>
+                      <BreadcrumbLink
+                        href={`/${selectedSection.slug}?url=${url}&device=${device}`}
+                      >
+                        {selectedSection.title}
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                  ) : (
+                    <BreadcrumbItem>
+                      <BreadcrumbLink
+                        href={`/dashboard?url=${url}&device=${device}`}
+                      >
+                        Resultados del análisis
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                  )}
+                </BreadcrumbList>
+              )}
             </Breadcrumb>
           </SiteHeader>
 
@@ -173,9 +189,7 @@ export default function Page() {
         </DashboardLayout>
 
         {/* Chat de Segment AI — slide desde la derecha */}
-        <ThemeProvider>
-          <Chat />
-        </ThemeProvider>
+        <Chat />
       </div>
     </SegmentChatProvider>
   )

@@ -36,7 +36,7 @@ export default function CursorFollower() {
   ]
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-50">
+    <div className="pointer-events-none fixed inset-0 z-100">
       {layers.map((layer, i) => (
         <motion.div
           key={i}

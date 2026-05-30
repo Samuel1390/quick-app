@@ -11,37 +11,25 @@ import "./output.css"
 import { GoogleSearch, ComplexProblems, FileSupport } from "./ModelCapabilities"
 import type { HistoryData } from "../../../server-actions/chatFormAction"
 
-import {
-  oneLight,
-  oneDark,
-  atomDark,
-} from "react-syntax-highlighter/dist/cjs/styles/prism"
-import useTheme from "../../../hooks/useTheme"
+import { atomDark } from "react-syntax-highlighter/dist/cjs/styles/prism"
 
 // EL markdow generado por gpt aun es muy dificil de interpretar con librerias comunes
 // por lo que aun es necesario trabajar en el renderizado de markdown
 // para asegurarse de que cubrimos todos los casos esto para formulas matematicas fisicas y quimicas
 
-/* Prompt para probar el renderizado de markdown:
-Genera todo tipo de formulas matemáticas físicas y químicas en markdown, incluyendo formulas de integrales, derivadas, ecuaciones diferenciales, matrices de álgebra lineal, series complejas, formulas de física como la ley de gravitación universal, formulas de química como la ecuación de estado de los gases ideales, etc. Asegúrate de incluir una gran variedad de formulas para probar el renderizado de markdown, esto con la finalidad de asegurar que el renderizado sea correcto y estético en el frontend.
- */
-
 type Props = {
   content: string
-  historyData: HistoryData
+  historyData?: HistoryData
 }
 
 const MarkdownRenderer = ({ content, historyData }: Props) => {
-  const { theme } = useTheme()
-  const { model: modelHash } = historyData
-  const modelObj = getModelObj(modelHash)
+  const modelHash = historyData?.model
+  const modelObj = modelHash ? getModelObj(modelHash) : null
   // Aplicamos la limpieza antes de pasarla al componente
   const preprocessedContent = preprocessContent(content)
 
   return (
-    <div
-      className={`model-output max-md:px-4 ${theme === "dark" ? "dark" : ""}`}
-    >
+    <div className={`model-output dark max-md:px-4`}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeKatex]}
@@ -58,14 +46,14 @@ const MarkdownRenderer = ({ content, historyData }: Props) => {
                 />
                 <SyntaxHighlighter
                   {...rest}
-                  style={theme === "dark" ? atomDark : oneLight}
+                  style={atomDark}
                   language={match[1]}
                   PreTag="div"
                   customStyle={{
                     margin: 0,
                     padding: "1.5rem",
                     fontSize: "0.875rem",
-                    backgroundColor: theme === "dark" ? "#0a0a0a" : "#f9fafb",
+                    backgroundColor: "#0a0a0a",
                   }}
                 >
                   {String(children).replace(/\n$/, "")}
@@ -98,23 +86,25 @@ const MarkdownRenderer = ({ content, historyData }: Props) => {
         {preprocessedContent}
       </ReactMarkdown>
       {/* Footer de la respuesta del modelo | contiene informacion adicional */}
-      <div className="mt-4 flex items-center justify-between gap-2 border-t-2 border-neutral-300 py-4 pt-3 dark:border-neutral-700">
-        <div className="flex items-center gap-1 text-[0.7rem] text-neutral-500 dark:text-neutral-400">
-          Modelo: {modelObj.label}
-          {modelObj?.icon && modelObj.icon}
+      {historyData && modelObj && (
+        <div className="mt-4 flex items-center justify-between gap-2 border-t-2 border-neutral-300 py-4 pt-3 dark:border-neutral-700">
+          <div className="flex items-center gap-1 text-[0.7rem] text-neutral-500 dark:text-neutral-400">
+            Modelo: {modelObj.label}
+            {modelObj?.icon && modelObj.icon}
+          </div>
+          <span className="flex items-center gap-2">
+            {(modelObj.supportsBrowserSearch ||
+              modelObj.nativeBrowserSearchFunctionality) && <GoogleSearch />}
+            {modelObj.supportsReasoning && <ComplexProblems />}
+            {modelObj.supportsFiles && <FileSupport />}
+            <SimpleCopyButton
+              hoverContent="Copiar markdown"
+              copiedContent="Markdown copiado!"
+              content={content}
+            />
+          </span>
         </div>
-        <span className="flex items-center gap-2">
-          {(modelObj.supportsBrowserSearch ||
-            modelObj.nativeBrowserSearchFunctionality) && <GoogleSearch />}
-          {modelObj.supportsReasoning && <ComplexProblems />}
-          {modelObj.supportsFiles && <FileSupport />}
-          <SimpleCopyButton
-            hoverContent="Copiar markdown"
-            copiedContent="Markdown copiado!"
-            content={content}
-          />
-        </span>
-      </div>
+      )}
     </div>
   )
 }

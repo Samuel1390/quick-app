@@ -58,10 +58,10 @@ export default function ChatInputForm({
       ref={formRef as any}
       onSubmit={handleSubmit}
       className={cn(
-        "w-full shadow-[0_-10px_40px_#fff] dark:shadow-[0_-10px_40px_#000]",
+        "w-[calc(100%_-_0.95rem)] shadow-[0_-10px_40px_#fff] dark:shadow-[0_-10px_40px_#000]",
         "max-w-[780px] rounded-lg",
-        "sticky bg-neutral-50 dark:bg-neutral-900",
-        "lg:px-3/2 bottom-0 z-50 px-1 text-sm"
+        "absolute bg-neutral-50 dark:bg-neutral-900",
+        "lg:px-3/2 bottom-4.5 z-50 px-1 text-sm"
       )}
     >
       <div className="absolute bottom-full">

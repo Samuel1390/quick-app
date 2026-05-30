@@ -4,11 +4,14 @@ import { cn } from "@/lib/utils"
 import { FileIcon, X } from "lucide-react"
 import { getIcon } from "omni-file"
 import Image from "next/image"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
+import { fileStore } from "../context/fileStore"
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card"
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 
 const Attachments = ({
   files,
@@ -19,6 +22,11 @@ const Attachments = ({
   setForm: (form: any) => void
   modelObj: any
 }) => {
+  const router = useRouter()
+  const params = useSearchParams()
+  const url = params.get("url")
+  const device = params.get("device")
+
   const handleRemoveFile = (
     event: React.MouseEvent<HTMLButtonElement>,
     i: number
@@ -34,14 +42,16 @@ const Attachments = ({
       }
     })
   }
+
   return (
     <div className="mb-2 flex w-full flex-wrap gap-2">
       {files.map((file, i) => (
         <HoverCard key={`${file.name}-${i}`}>
-          <HoverCardTrigger>
+          <HoverCardTrigger asChild>
             <div
+              onClick={() => handleViewFile(file, router, url, device)}
               className={cn(
-                `flex items-center gap-2 border font-semibold hover:cursor-pointer`,
+                `flex items-center gap-2 border font-semibold transition-opacity hover:cursor-pointer hover:opacity-80`,
                 `rounded-md px-3 py-1 text-sm`,
                 `${
                   modelObj.supportsFiles
@@ -59,7 +69,7 @@ const Attachments = ({
               <span className="max-w-[120px] truncate">{file.name}</span>
               <button
                 type="button"
-                className="text-neutral-500 transition-colors hover:text-red-500"
+                className="ml-1 text-neutral-500 transition-colors hover:text-red-500"
                 onClick={(e) => handleRemoveFile(e, i)}
               >
                 <X size={16} />
@@ -72,6 +82,20 @@ const Attachments = ({
         </HoverCard>
       ))}
     </div>
+  )
+}
+export const handleViewFile = (
+  file: File,
+  router: AppRouterInstance,
+  url: string | null | undefined,
+  device: string | null | undefined
+) => {
+  const viewFileURL = new URLSearchParams()
+  if (device) viewFileURL.set("device", device)
+  if (url) viewFileURL.set("url", url)
+  fileStore.setFile(file)
+  router.push(
+    `/dashboard/view-file/${encodeURIComponent(file.name)}?${viewFileURL.toString()}`
   )
 }
 

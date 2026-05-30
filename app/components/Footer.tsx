@@ -43,7 +43,7 @@ const Footer = () => {
           </HoverCard>
         </MagneticWrapper>
       </div>
-      <div className="flex items-center gap-10">
+      <div className="flex items-center gap-2 sm:gap-10">
         <div className="pointer-events-auto">
           <MagneticWrapper borderRadius={50} range={RANGE}>
             <HoverCard>

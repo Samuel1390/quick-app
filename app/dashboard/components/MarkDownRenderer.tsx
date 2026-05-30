@@ -71,7 +71,10 @@ const MarkdownRenderer = ({ selectedSection, setSelectedSection }: Props) => {
             <Button
               variant={"outline"}
               size={"icon-sm"}
-              onClick={() => setSelectedSection(docsSections[position - 1])}
+              disabled={position === 0}
+              onClick={() =>
+                position > 0 && setSelectedSection(docsSections[position - 1])
+              }
             >
               <HoverCard>
                 <HoverCardTrigger>
@@ -83,7 +86,11 @@ const MarkdownRenderer = ({ selectedSection, setSelectedSection }: Props) => {
             <Button
               size={"icon-sm"}
               variant={"outline"}
-              onClick={() => setSelectedSection(docsSections[position + 1])}
+              disabled={position === docsSections.length - 1}
+              onClick={() =>
+                position < docsSections.length - 1 &&
+                setSelectedSection(docsSections[position + 1])
+              }
             >
               <HoverCard>
                 <HoverCardTrigger>
@@ -98,7 +105,7 @@ const MarkdownRenderer = ({ selectedSection, setSelectedSection }: Props) => {
       <ReactMarkdown
         components={{
           code(props) {
-            const { children, className, node, ...rest } = props
+            const { children, className, node, ref, ...rest } = props
             const match = /language-(\w+)/.exec(className || "")
 
             return match ? (

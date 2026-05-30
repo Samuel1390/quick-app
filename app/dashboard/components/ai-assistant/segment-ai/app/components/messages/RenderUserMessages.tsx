@@ -3,6 +3,9 @@ import { RetryIcon } from "@/components/icons/pajamas-retry"
 import { Ref } from "react"
 import { LastUserMessage } from "../../hooks/useChatState"
 import { FileIcon } from "lucide-react"
+import { fileStore } from "../context/fileStore"
+import { useRouter, useSearchParams } from "next/navigation"
+import { handleViewFile } from "../chat/Attachments"
 import {
   HoverCard,
   HoverCardContent,
@@ -24,6 +27,10 @@ const RenderUserMessage = ({
   retry,
   ref,
 }: RenderUserMessageProps) => {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const device = searchParams.get("device")
+  const url = searchParams.get("url")
   return (
     <div className="mb-4 flex w-full flex-col items-end gap-1" ref={ref}>
       {/* CONTENEDOR PARA EL MENSAJE DEL USUARIO */}
@@ -45,7 +52,10 @@ const RenderUserMessage = ({
           userMessage.files.map((file, i) => (
             <HoverCard key={`${i}-${file.name}-${file.size}`}>
               <HoverCardTrigger>
-                <div className="sm:text-md mt-1 flex cursor-pointer items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-sm text-xs font-medium text-blue-600 transition-colors hover:bg-blue-100 sm:flex-row dark:border-blue-900/50 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-900/50">
+                <div
+                  onClick={() => handleViewFile(file, router, url, device)}
+                  className="sm:text-md mt-1 flex cursor-pointer items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-sm text-xs font-medium text-blue-600 transition-colors hover:bg-blue-100 sm:flex-row dark:border-blue-900/50 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-900/50"
+                >
                   {getIcon(file.name) ? (
                     <Image
                       src={`/icons/${getIcon(file.name)}.svg`}
