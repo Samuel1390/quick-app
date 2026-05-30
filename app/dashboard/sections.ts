@@ -7,7 +7,6 @@ import {
   Video,
   Code,
 } from "lucide-react"
-import { useMarkdown } from "../../hooks/useMarkdown"
 
 export type DocsSection = {
   title: string
