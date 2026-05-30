@@ -1,4 +1,5 @@
 "use client"
+export const dynamic = "force-dynamic"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
 import { urlRegex } from "../constants"
@@ -120,75 +121,73 @@ export default function Page() {
   return (
     <SegmentChatProvider data={data} url={url ?? ""} device={device ?? ""}>
       <div className="relative">
-        <React.Suspense fallback={<div className="p-5">Cargando métricas</div>}>
-          <DashboardLayout
-            sidebar={
-              <AppSidebar
-                docs={docsSections}
-                selectedSection={selectedSection}
-                setSelectedSection={setSelectedSection}
-              />
-            }
-          >
-            <SiteHeader>
-              <Breadcrumb>
-                {width && width >= 800 && (
-                  <BreadcrumbList>
-                    <BreadcrumbItem>
-                      <BreadcrumbLink href="/">Inicio</BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    {selectedSection ? (
-                      <BreadcrumbItem>
-                        <BreadcrumbLink
-                          href={`/${selectedSection.slug}?url=${url}&device=${device}`}
-                        >
-                          {selectedSection.title}
-                        </BreadcrumbLink>
-                      </BreadcrumbItem>
-                    ) : (
-                      <BreadcrumbItem>
-                        <BreadcrumbLink
-                          href={`/dashboard?url=${url}&device=${device}`}
-                        >
-                          Resultados del análisis
-                        </BreadcrumbLink>
-                      </BreadcrumbItem>
-                    )}
-                  </BreadcrumbList>
-                )}
-              </Breadcrumb>
-            </SiteHeader>
-
-            <div className="flex flex-1 flex-col">
-              <div className="@container/main flex flex-1 flex-col gap-2">
-                <div className="mx-3 flex gap-4 py-4 md:mx-6 md:gap-6 md:py-6">
-                  {isPending &&
-                    !errorReason &&
-                    url &&
-                    device &&
-                    !selectedSection && (
-                      <FallbackComponent url={url!} device={device} />
-                    )}
+        <DashboardLayout
+          sidebar={
+            <AppSidebar
+              docs={docsSections}
+              selectedSection={selectedSection}
+              setSelectedSection={setSelectedSection}
+            />
+          }
+        >
+          <SiteHeader>
+            <Breadcrumb>
+              {width && width >= 800 && (
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="/">Inicio</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
                   {selectedSection ? (
-                    <MarkdownRenderer
-                      selectedSection={selectedSection}
-                      setSelectedSection={setSelectedSection}
-                    />
-                  ) : !errorReason && url && device ? (
-                    <Dashboard data={data} url={url!} device={device} />
+                    <BreadcrumbItem>
+                      <BreadcrumbLink
+                        href={`/${selectedSection.slug}?url=${url}&device=${device}`}
+                      >
+                        {selectedSection.title}
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
                   ) : (
-                    <ErrorCard
-                      reason={errorReason || "invalid-url"}
-                      currentUrl={url || ""}
-                      currentDevice={device || ""}
-                    />
+                    <BreadcrumbItem>
+                      <BreadcrumbLink
+                        href={`/dashboard?url=${url}&device=${device}`}
+                      >
+                        Resultados del análisis
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
                   )}
-                </div>
+                </BreadcrumbList>
+              )}
+            </Breadcrumb>
+          </SiteHeader>
+
+          <div className="flex flex-1 flex-col">
+            <div className="@container/main flex flex-1 flex-col gap-2">
+              <div className="mx-3 flex gap-4 py-4 md:mx-6 md:gap-6 md:py-6">
+                {isPending &&
+                  !errorReason &&
+                  url &&
+                  device &&
+                  !selectedSection && (
+                    <FallbackComponent url={url!} device={device} />
+                  )}
+                {selectedSection ? (
+                  <MarkdownRenderer
+                    selectedSection={selectedSection}
+                    setSelectedSection={setSelectedSection}
+                  />
+                ) : !errorReason && url && device ? (
+                  <Dashboard data={data} url={url!} device={device} />
+                ) : (
+                  <ErrorCard
+                    reason={errorReason || "invalid-url"}
+                    currentUrl={url || ""}
+                    currentDevice={device || ""}
+                  />
+                )}
               </div>
             </div>
-          </DashboardLayout>
-        </React.Suspense>
+          </div>
+        </DashboardLayout>
 
         {/* Chat de Segment AI — slide desde la derecha */}
         <Chat />
