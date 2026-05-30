@@ -1,6 +1,5 @@
-"use client";
-import * as React from "react";
-import useTheme from "@/app/hooks/useTheme";
+"use client"
+import * as React from "react"
 
 export function GithubTwotoneIcon({
   size = 24,
@@ -9,9 +8,9 @@ export function GithubTwotoneIcon({
   className,
   ...props
 }: React.SVGProps<SVGSVGElement> & {
-  size?: number;
-  color?: string;
-  strokeWidth?: number;
+  size?: number
+  color?: string
+  strokeWidth?: number
 }) {
   return (
     <svg
@@ -58,5 +57,5 @@ export function GithubTwotoneIcon({
         />
       </path>
     </svg>
-  );
+  )
 }
