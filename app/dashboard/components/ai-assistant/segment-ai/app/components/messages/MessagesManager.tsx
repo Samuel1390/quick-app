@@ -1,24 +1,24 @@
-"use client";
-import RenderUserMessage from "./RenderUserMessages";
-import Output from "./output/Output";
-import Logo from "../Logo";
-import React, { useEffect, useRef } from "react";
-import ReasoningBlock from "./ReasoningBlock";
-import { LastUserMessage } from "../../hooks/useChatState";
-import type { HistoryData } from "../../server-actions/chatFormAction";
-import type { ModelHashes } from "../../constants";
-import { cn } from "@/lib/utils";
+"use client"
+import RenderUserMessage from "./RenderUserMessages"
+import Output from "./output/Output"
+import Logo from "../Logo"
+import React, { useEffect, useRef } from "react"
+import ReasoningBlock from "./ReasoningBlock"
+import { LastUserMessage } from "../../hooks/useChatState"
+import type { HistoryData } from "../../server-actions/chatFormAction"
+import type { ModelHashes } from "../../constants"
+import { cn } from "@/lib/utils"
 
 type MessagesManagerProps = {
-  isPending: boolean;
-  lastUserMessage: LastUserMessage;
-  hasError?: boolean;
-  onRetry?: () => void;
-  historyData: HistoryData[];
-  isStreaming?: boolean;
-  streamingContent?: string;
-  streamingModel?: ModelHashes | null;
-};
+  isPending: boolean
+  lastUserMessage: LastUserMessage
+  hasError?: boolean
+  onRetry?: () => void
+  historyData: HistoryData[]
+  isStreaming?: boolean
+  streamingContent?: string
+  streamingModel?: ModelHashes | null
+}
 
 function MessagesManager({
   isPending,
@@ -30,7 +30,7 @@ function MessagesManager({
   streamingContent = "",
   streamingModel = null,
 }: MessagesManagerProps) {
-  const userMessageRef = useRef<HTMLDivElement>(null);
+  const userMessageRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     // Timeout para asegurar que el DOM se haya repintado
@@ -39,24 +39,24 @@ function MessagesManager({
         userMessageRef.current.scrollIntoView({
           behavior: "smooth",
           block: "start",
-        });
+        })
       }
-    }, 100);
+    }, 100)
 
-    return () => clearTimeout(timeout);
-  }, [lastUserMessage, historyData.length, isPending, hasError, isStreaming]);
+    return () => clearTimeout(timeout)
+  }, [lastUserMessage, historyData.length, isPending, hasError, isStreaming])
 
   return (
     <article
       className={cn(
-        "w-full overflow-x-auto lg:px-0 px-2 pb-10",
-        streamingContent && "scroll-smooth",
+        "w-full overflow-x-auto px-2 pb-10 lg:px-0",
+        streamingContent && "scroll-smooth"
       )}
     >
       {historyData.map((data) => {
         return data.messages.map((message, index) => {
           if (message.role === "user") {
-            const isLastRenderedUserMsg = index >= historyData.length - 1;
+            const isLastRenderedUserMsg = index >= historyData.length - 1
             return (
               <RenderUserMessage
                 ref={
@@ -73,10 +73,10 @@ function MessagesManager({
                 userMessage={{
                   prompt: message.content,
                   files: data.files, // puede ser undefined
-                  filesNames: data.filesNames, // puede ser undefined
+                  filesNames: data.files?.map((file) => file.name), // puede ser undefined
                 }}
               />
-            );
+            )
           } else if (message.role === "model") {
             return (
               <React.Fragment key={`model-message-${index}`}>
@@ -90,12 +90,12 @@ function MessagesManager({
                   null}
                 <Output historyData={data} content={message.content} />
               </React.Fragment>
-            );
+            )
           } else {
-            console.warn("Mensaje no reconocido", message);
-            return null;
+            console.warn("Mensaje no reconocido", message)
+            return null
           }
-        });
+        })
       })}
       {/* Mensaje del usuario mientras se espera respuesta (pending o streaming) */}
       {(isPending || isStreaming || hasError) && (
@@ -108,9 +108,9 @@ function MessagesManager({
       )}
       {/* Contenido streaming: renderizar el texto parcial del modelo */}
       {(isPending || isStreaming) && (
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center gap-2">
           <Logo size={16} className="animate-spin" />
-          <p className="text-sm dark:text-neutral-300 animate-pulse">
+          <p className="animate-pulse text-sm dark:text-neutral-300">
             Pensando...
           </p>
         </div>
@@ -133,7 +133,7 @@ function MessagesManager({
       )}
       {/* Spinner cuando no hay contenido o no esta completo */}
     </article>
-  );
+  )
 }
 
-export default MessagesManager;
+export default MessagesManager

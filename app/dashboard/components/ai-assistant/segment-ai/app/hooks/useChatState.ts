@@ -126,7 +126,6 @@ export function useChatState() {
 
       const prompt = formData.get("prompt") as string
       const files = formData.getAll("files") as File[]
-      const filesNames = files.map((f) => f.name)
       const historyDataRaw = formData.get("historyData") as string
       const prevHistory: HistoryData[] = historyDataRaw
         ? JSON.parse(historyDataRaw)
@@ -147,7 +146,7 @@ export function useChatState() {
         {
           prompt,
           files,
-          filesNames,
+          filesNames: files.map((f) => f.name),
           messageId: nanoid(),
           model,
           supportsReasoning: modelObj.supportsReasoning,

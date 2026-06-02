@@ -28,7 +28,6 @@ type ChatInputFormProps = {
   setForm: (form: any) => void
   formLoading: boolean
   modelObj: Models[number]
-  setModelObj: (modelObj: Models[number]) => void
   isFormAvailable: (extracontitions: boolean[]) => boolean
   isOnline: boolean
   isStreaming: boolean
@@ -58,9 +57,9 @@ export default function ChatInputForm({
       ref={formRef as any}
       onSubmit={handleSubmit}
       className={cn(
-        "w-[calc(100%_-_0.95rem)] shadow-[0_-10px_40px_#fff] dark:shadow-[0_-10px_40px_#000]",
+        "shadow-[0_-10px_40px_#fff] dark:shadow-[0_-10px_40px_#000]",
         "max-w-[780px] rounded-lg",
-        "absolute bg-neutral-50 dark:bg-neutral-900",
+        "sticky bg-neutral-50 dark:bg-neutral-900",
         "lg:px-3/2 bottom-4.5 z-50 px-1 text-sm"
       )}
     >

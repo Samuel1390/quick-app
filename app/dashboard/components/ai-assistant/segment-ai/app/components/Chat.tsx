@@ -45,7 +45,6 @@ const Chat = () => {
     setForm,
     formLoading,
     modelObj,
-    setModelObj,
   } = useChatInput(setFeedbackMessage)
 
   // Inyectar el diagnóstico de performance cuando esté disponible
@@ -56,7 +55,6 @@ const Chat = () => {
       setForm((prev) => ({
         ...prev,
         files: [file],
-        filesNames: [file.name],
         prompt,
       }))
       chatCtx.clearPendingDiagnostic()
@@ -129,7 +127,7 @@ const Chat = () => {
     >
       <section
         className={cn(
-          `flex w-full flex-1 flex-col items-center justify-start px-2`
+          `flex min-h-[calc(100vh_-_11rem)] w-full flex-1 flex-col items-center justify-start px-2`
         )}
       >
         <section className="sticky top-0 z-50 flex w-full items-center bg-neutral-50/50 backdrop-blur-sm sm:hidden dark:bg-neutral-950/50">
@@ -179,7 +177,6 @@ const Chat = () => {
         setForm={setForm}
         formLoading={formLoading}
         modelObj={modelObj}
-        setModelObj={setModelObj}
         isFormAvailable={isFormAvailable}
         isStreaming={isStreaming}
         sendStreamingMessage={sendStreamingMessage}

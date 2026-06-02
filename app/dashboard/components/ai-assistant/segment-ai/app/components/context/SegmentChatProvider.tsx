@@ -23,10 +23,11 @@ export function SegmentChatProvider({
     file: File
     prompt: string
   } | null>(null)
+  const [diagnosticGenerated, setDiagnosticGenerated] = useState(false)
 
   // Cuando el análisis de Lighthouse se completa exitosamente, genera el diagnóstico
   useEffect(() => {
-    if (data && "lighthouseMetrics" in data) {
+    if (data && "lighthouseMetrics" in data && !diagnosticGenerated) {
       const generator = new PerformanceDiagnosticGenerator(data, url, device)
       const file = generator.toFile()
       setPendingDiagnostic({
@@ -34,15 +35,21 @@ export function SegmentChatProvider({
         prompt:
           "Genera un reporte con las recomendaciones y los cambios que se deben realizar en el código para optimizar el rendimiento.",
       })
+      setDiagnosticGenerated(true)
     }
-  }, [data, url, device])
+  }, [data])
 
   const toggleChat = () => setIsChatOpen((prev) => !prev)
   const clearPendingDiagnostic = () => setPendingDiagnostic(null)
 
   return (
     <SegmentChatContext.Provider
-      value={{ isChatOpen, toggleChat, pendingDiagnostic, clearPendingDiagnostic }}
+      value={{
+        isChatOpen,
+        toggleChat,
+        pendingDiagnostic,
+        clearPendingDiagnostic,
+      }}
     >
       {children}
     </SegmentChatContext.Provider>

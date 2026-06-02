@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { MODELS, isNotTextFile } from "../constants"
 import type { ModelHashes, Models } from "../constants"
 import useRecorder from "./useRecorder"
@@ -9,7 +9,6 @@ export type FormState = {
   tool: string
   model: ModelHashes
   files: File[]
-  filesNames: string[]
 }
 
 export function useChatInput(setFeedbackMessage: (msg: string) => void) {
@@ -18,23 +17,18 @@ export function useChatInput(setFeedbackMessage: (msg: string) => void) {
     tool: "text",
     model: MODELS[0].modelHash,
     files: [],
-    filesNames: [],
   })
+  const modelObj = getModelObj(form.model)
   const [formLoading, setFormLoading] = useState(false)
   const recorder = useRecorder()
-  const [modelObj, setModelObj] = useState<Models[number]>(
-    getModelObj(form.model)
-  )
 
   useEffect(() => {
-    const modelObj = getModelObj(form.model)
-    setModelObj(modelObj)
     if (form.files.length > 0 && !modelObj.supportsFiles) {
       setFeedbackMessage(
         "El modelo actual no soporta archivos, cambia de modelo para poder usar esta funcionalidad"
       )
     }
-  }, [form.model])
+  }, [form.model, form.files.length, modelObj.supportsFiles])
 
   useEffect(() => {
     // Transcribe el audio si hay un blob y la duración es mayor a 1 segundo
@@ -68,82 +62,77 @@ export function useChatInput(setFeedbackMessage: (msg: string) => void) {
     setForm((prev) => ({ ...prev, prompt: value }))
   }
 
-  useEffect(() => {
-    // Actualiza el nombre de los archivos
-    setForm((prev: any) => ({
-      ...prev,
-      filesNames: prev.files.map((file: File) => file.name),
-    }))
-  }, [form.files])
-
-  const handleFilesChange = async (files: File[]) => {
-    if (!modelObj.supportsFiles && files.length > 0) {
-      setFeedbackMessage(
-        "El modelo actual no soporta archivos, cambia de modelo para poder usar esta funcionalidad"
-      )
-      return
-    }
-
-    const maxMegabytes = 30
-    setFormLoading(true)
-    for (const file of files) {
-      try {
-        if (file.size / Math.pow(10, 6) >= maxMegabytes) {
-          setFeedbackMessage(
-            `El archivo es muy grande, solo se permiten archivos de texto de hasta ${maxMegabytes}mb`
-          )
-          setFormLoading(false)
-          return
-        }
-        const data = await file.text()
-
-        if (isNotTextFile.test(file.name)) {
-          setFeedbackMessage(
-            "El archivo no es un archivo de texto, solo se permiten archivos de texto"
-          )
-          setFormLoading(false)
-          return
-        }
-
-        if (data.trim().length > 10000) {
-          setFeedbackMessage(
-            "El archivo es muy grande, solo se permiten archivos de texto de hasta 10kb"
-          )
-          setFormLoading(false)
-          return
-        }
-        if (data.trim().length === 0) {
-          setFeedbackMessage("El archivo está vacío")
-          setFormLoading(false)
-          return
-        }
-        setForm((prev) => {
-          const newFiles = prev.files.filter((f) => f.name !== file.name)
-          return { ...prev, files: [...newFiles, file] }
-        })
-      } catch (err) {
-        console.log(err)
+  const handleFilesChange = useCallback(
+    async (files: File[]) => {
+      if (!modelObj.supportsFiles && files.length > 0) {
         setFeedbackMessage(
-          "Error al leer el archivo, solo se permiten archivos de texto"
+          "El modelo actual no soporta archivos, cambia de modelo para poder usar esta funcionalidad"
         )
-        setFormLoading(false)
         return
       }
-    }
-    setFormLoading(false)
-  }
 
-  const handleToolChange = (value: string) => {
+      const maxMegabytes = 30
+      setFormLoading(true)
+      for (const file of files) {
+        try {
+          if (file.size / Math.pow(10, 6) >= maxMegabytes) {
+            setFeedbackMessage(
+              `El archivo es muy grande, solo se permiten archivos de texto de hasta ${maxMegabytes}mb`
+            )
+            setFormLoading(false)
+            return
+          }
+          const data = await file.text()
+
+          if (isNotTextFile.test(file.name)) {
+            setFeedbackMessage(
+              "El archivo no es un archivo de texto, solo se permiten archivos de texto"
+            )
+            setFormLoading(false)
+            return
+          }
+
+          if (data.trim().length > 10000) {
+            setFeedbackMessage(
+              "El archivo es muy grande, solo se permiten archivos de texto de hasta 10kb"
+            )
+            setFormLoading(false)
+            return
+          }
+          if (data.trim().length === 0) {
+            setFeedbackMessage("El archivo está vacío")
+            setFormLoading(false)
+            return
+          }
+          setForm((prev) => {
+            const newFiles = prev.files.filter((f) => f.name !== file.name)
+            return { ...prev, files: [...newFiles, file] }
+          })
+        } catch (err) {
+          console.log(err)
+          setFeedbackMessage(
+            "Error al leer el archivo, solo se permiten archivos de texto"
+          )
+          setFormLoading(false)
+          return
+        }
+      }
+      setFormLoading(false)
+    },
+    [modelObj.supportsFiles, setFeedbackMessage]
+  )
+
+  const handleToolChange = useCallback((value: string) => {
     setForm((prev) => ({ ...prev, tool: value }))
-  }
+  }, [])
 
-  const setModel = (model: ModelHashes) => {
+  const setModel = useCallback((model: ModelHashes) => {
     setForm((prev) => ({ ...prev, model }))
-  }
+  }, [])
 
-  const clearPrompt = () => {
+  const clearPrompt = useCallback(() => {
     setForm((prev) => ({ ...prev, prompt: "", files: [], filesNames: [] }))
-  }
+  }, [])
 
   return {
     form,
@@ -156,6 +145,5 @@ export function useChatInput(setFeedbackMessage: (msg: string) => void) {
     setForm,
     formLoading,
     modelObj,
-    setModelObj,
   }
 }
