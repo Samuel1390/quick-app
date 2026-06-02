@@ -72,7 +72,7 @@ export function ResourceSizePieChart({ resourceSummary }: Props) {
       <CardContent className="flex flex-col items-center justify-start gap-4 pb-0 md:flex-row md:items-stretch md:justify-between">
         {/* 3. Sección de leyendas (Tus datos, mi estilo de alineación) */}
         <section className="flex w-full flex-col items-start gap-2 md:w-auto md:flex-1">
-          {mappedItems22
+          {[...mappedItems22]
             .sort((a, b) => b.transferSize - a.transferSize)
             .map((item) => (
               <div key={item.label} className="flex items-center gap-2 text-sm">

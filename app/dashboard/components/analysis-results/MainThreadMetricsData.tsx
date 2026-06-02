@@ -79,7 +79,7 @@ export function MainThreadPieChart({
       <CardContent className="flex flex-col items-center justify-start gap-4 pb-0 md:flex-row md:items-stretch md:justify-between">
         {/* Sección de leyendas alineada al lado izquierdo (Tu estilo personalizado) */}
         <section className="flex w-full flex-col items-start gap-2 md:w-auto md:flex-1">
-          {mappedItems
+          {[...mappedItems]
             .sort((a, b) => b.duration - a.duration)
             .map((item) => (
               <div key={item.group} className="flex items-center gap-2 text-sm">
