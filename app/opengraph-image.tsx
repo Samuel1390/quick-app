@@ -1,4 +1,10 @@
 import { ImageResponse } from "next/og"
+import { Geist_Mono } from "next/font/google"
+
+const fontMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+})
 
 export const size = {
   width: 720,
@@ -28,8 +34,8 @@ export default function Icon() {
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="400px"
-          height="400px"
+          width="180px"
+          height="180px"
           viewBox="0 0 512 512"
           style={{
             color: "#ffffff",
@@ -51,9 +57,10 @@ export default function Icon() {
         </svg>
         <h2
           style={{
-            fontSize: "80px",
-            fontWeight: "bold",
+            fontSize: "50px",
+            fontWeight: "bolder",
             color: "#ffffff",
+            fontFamily: fontMono.style.fontFamily,
           }}
         >
           Quick-App
